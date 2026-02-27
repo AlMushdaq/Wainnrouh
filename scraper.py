@@ -7,6 +7,7 @@ import sys
 import json
 import argparse
 import math
+from urllib.parse import quote
 from playwright.sync_api import sync_playwright
 
 
@@ -19,16 +20,31 @@ def haversine_km(lat1, lon1, lat2, lon2):
          math.sin(d_lon / 2) ** 2)
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
+import re
+
+
+def is_arabic(text):
+    """Check if text contains Arabic characters."""
+    return bool(re.search(r'[\u0600-\u06FF]', text))
+
 
 def scrape_google_maps(query, city, user_lat=None, user_lng=None, max_results=10, sort_mode='distance'):
+    arabic = is_arabic(query) or is_arabic(city)
+
     if sort_mode == 'stars':
-        search_term = f"best {query} in {city}"
-        url = f"https://www.google.com/maps/search/{search_term.replace(' ', '+')}"
+        if arabic:
+            search_term = f"{query} {city}"
+        else:
+            search_term = f"best {query} in {city}"
+        url = f"https://www.google.com/maps/search/{quote(search_term)}"
     elif user_lat and user_lng:
-        url = f"https://www.google.com/maps/search/{query.replace(' ', '+')}/@{user_lat},{user_lng},14z"
+        url = f"https://www.google.com/maps/search/{quote(query)}/@{user_lat},{user_lng},14z"
     else:
-        search_term = f"{query} in {city}"
-        url = f"https://www.google.com/maps/search/{search_term.replace(' ', '+')}"
+        if arabic:
+            search_term = f"{query} {city}"
+        else:
+            search_term = f"{query} in {city}"
+        url = f"https://www.google.com/maps/search/{quote(search_term)}"
 
     results = []
 
@@ -68,8 +84,8 @@ def scrape_google_maps(query, city, user_lat=None, user_lng=None, max_results=10
                 except:
                     break
 
-            # Extract places
-            place_links = page.locator('div[role="feed"] > div > div > a[href*="/maps/place/"]').all()
+            # Extract places — use broad selector that works in all locales
+            place_links = page.locator('div[role="feed"] a[href*="/maps/place/"]').all()
 
             for link in place_links[:max_results * 2]:
                 if len(results) >= max_results:
@@ -134,7 +150,8 @@ def scrape_google_maps(query, city, user_lat=None, user_lng=None, max_results=10
                         "lng": lng,
                         "distanceKm": distance_km,
                     })
-                except:
+                except Exception as e:
+                    print(f"DEBUG Error for link: {e}", file=sys.stderr)
                     continue
 
         except Exception as e:
