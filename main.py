@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException, Body, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
@@ -24,6 +25,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    # This ensures CORS headers are returned even on unhandled 500 errors!
+    return JSONResponse(
+        status_code=500,
+        content={"error": "Internal Server Error", "details": str(exc)},
+    )
+
+@app.on_event("startup")
+def startup_event():
+    # Force install the chromium browser on startup to guarantee it exists 
+    # regardless of whether Railway uses Docker or Nixpacks.
+    print("Ensuring Playwright Chromium is installed...")
+    os.system("playwright install chromium")
 
 class ScrapeRequest(BaseModel):
     city: str
