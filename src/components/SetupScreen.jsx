@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
+import { RubberHoseRocket, RubberHoseLegs, RubberHoseMap, RubberHosePlane, RubberHosePointer } from './RetroIllustrations';
 
 export default function SetupScreen({ onComplete, t }) {
     const [city, setCity] = useState('');
@@ -14,6 +15,7 @@ export default function SetupScreen({ onComplete, t }) {
 
     return (
         <div className="setup-container fade-in">
+            <RubberHoseRocket />
             <div className="setup-header">
                 <h1>{t.title}</h1>
                 <p>{t.subtitle}</p>
@@ -23,7 +25,8 @@ export default function SetupScreen({ onComplete, t }) {
                 <div className="input-group">
                     <label htmlFor="city">{t.whereAreWe}</label>
                     <div className="input-wrapper">
-                        <MapPin className="input-icon" size={20} />
+                        <RubberHoseMap />
+                        <MapPin className="input-icon" size={20} style={{ opacity: 0 }} />
                         <input
                             id="city"
                             type="text"
@@ -38,7 +41,7 @@ export default function SetupScreen({ onComplete, t }) {
                 <div className="input-group">
                     <label htmlFor="category">{t.whatAreWeLookingFor}</label>
                     <div className="input-wrapper">
-                        <Navigation className="input-icon" size={20} />
+                        <Navigation className="input-icon" size={20} style={{ opacity: 0 }} />
                         <input
                             id="category"
                             type="text"
@@ -50,14 +53,20 @@ export default function SetupScreen({ onComplete, t }) {
                     </div>
                 </div>
 
-                <button
-                    type="submit"
-                    className="btn-primary"
-                    disabled={!city.trim() || !category.trim()}
-                >
-                    {t.startSession}
-                </button>
+                <div style={{ position: 'relative', marginTop: '1rem', width: '100%', display: 'flex' }}>
+                    <RubberHosePlane />
+                    <RubberHosePointer />
+                    <button
+                        type="submit"
+                        className="btn-primary"
+                        style={{ width: '100%', margin: 0 }}
+                        disabled={!city.trim() || !category.trim()}
+                    >
+                        {t.startSession}
+                    </button>
+                </div>
             </form>
+            <RubberHoseLegs />
         </div>
     );
 }

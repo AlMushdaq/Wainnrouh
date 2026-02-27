@@ -237,10 +237,10 @@ app.post('/api/smart-suggest', async (req, res) => {
       });
     }
 
-    // Step 3: Filter — only keep places with 4+ stars AND 10+ reviews (or null reviews if hidden)
+    // Step 3: Filter — only keep places with 4+ stars AND 10+ reviews
     let filtered = scraped.filter(p => {
       const hasGoodRating = p.rating && p.rating >= 4.0;
-      const hasEnoughReviews = p.reviews === null || p.reviews >= 10;
+      const hasEnoughReviews = p.reviews && p.reviews >= 10;
       return hasGoodRating && hasEnoughReviews;
     });
 
