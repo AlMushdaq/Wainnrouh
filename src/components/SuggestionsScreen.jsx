@@ -29,14 +29,22 @@ export default function SuggestionsScreen({ city, category, suggestions, onAdd, 
         setSearchStatus(t.searchingMaps);
 
         try {
-            const res = await fetch('/api/smart-suggest', {
+            // Determine the mood query modifier based on the sort type
+            let moodModifier = '';
+            if (sortBy === 'rating') moodModifier = 'top rated';
+            if (sortBy === 'distance') moodModifier = 'closest';
+            if (sortBy === 'trending') moodModifier = 'popular trending';
+
+            // Point to the new FastAPI backend endpoint if in local dev, or relative path if deployed
+            const apiUrl = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api/scrape` : '/api/scrape';
+
+            const res = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     city,
                     category,
-                    sortBy,
-                    exclude: seenNames,
+                    mood: moodModifier,
                     userLat: userLocation?.lat || null,
                     userLng: userLocation?.lng || null,
                 }),

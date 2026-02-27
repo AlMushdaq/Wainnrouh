@@ -3,7 +3,7 @@ import SetupScreen from './components/SetupScreen';
 import SuggestionsScreen from './components/SuggestionsScreen';
 import SpinRevealScreen from './components/SpinRevealScreen';
 import { translations } from './translations';
-import { Globe } from 'lucide-react';
+import { Globe, Moon, Sun } from 'lucide-react';
 const RetroBackground = () => (
   <div className="retro-bg-container">
     {/* Large Stars */}
@@ -58,6 +58,17 @@ function App() {
   const [suggestions, setSuggestions] = useState([]); // { id: string, name: string, category: string, isAi: boolean }
   const [language, setLanguage] = useState('ar'); // Default arabic
   const [userLocation, setUserLocation] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check local storage or system preference on initial load
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        return savedTheme === 'dark';
+      }
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
 
   // Get user location on app start
   useEffect(() => {
@@ -68,6 +79,18 @@ function App() {
       );
     }
   }, []);
+
+  // Sync dark mode state with document class and local storage
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) {
+      root.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -108,6 +131,14 @@ function App() {
         <button className="lang-toggle-btn" onClick={toggleLanguage} aria-label="Toggle language">
           <Globe size={20} />
           {language === 'ar' ? 'English' : 'عربي'}
+        </button>
+
+        <button
+          className="theme-toggle-btn"
+          onClick={() => setIsDarkMode(prev => !prev)}
+          aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
         </button>
 
         {currentScreen === 'setup' && (

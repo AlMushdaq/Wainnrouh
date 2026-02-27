@@ -4,13 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"node server.js\" \"vite\"",
+    "dev": "concurrently \"uvicorn main:app --port 3001 --reload\" \"vite\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "dev:client": "vite",
-    "dev:server": "node server.js",
-    "start": "NODE_ENV=production node server.js"
+    "dev:server": "uvicorn main:app --port 3001 --reload",
+    "start": "uvicorn main:app --host 0.0.0.0 --port $PORT"
   },
   "dependencies": {
     "concurrently": "^9.2.1",

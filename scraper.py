@@ -20,7 +20,7 @@ def haversine_km(lat1, lon1, lat2, lon2):
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
 
-def scrape_google_maps(query, city, user_lat=None, user_lng=None, max_results=10, sort_mode='distance'):
+def scrape_google_maps(query, city, user_lat=None, user_lng=None, max_results=10, sort_mode='distance', mood=''):
     if sort_mode == 'stars':
         search_term = f"best {query} in {city}"
         url = f"https://www.google.com/maps/search/{search_term.replace(' ', '+')}"
@@ -153,9 +153,11 @@ def main():
     parser.add_argument("--lng", type=float, default=None)
     parser.add_argument("--max", type=int, default=10)
     parser.add_argument("--sort", default="distance", choices=["distance", "stars"])
+    parser.add_argument("--mood", type=str, default="")
     args = parser.parse_args()
 
-    places = scrape_google_maps(args.query, args.city, args.lat, args.lng, args.max, args.sort)
+    # The query is already combined with mood in main.py, but we pass it anyway for compatibility
+    places = scrape_google_maps(args.query, args.city, args.lat, args.lng, args.max, args.sort, args.mood)
     print(json.dumps({"suggestions": places}, ensure_ascii=False))
 
 
