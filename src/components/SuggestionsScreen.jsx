@@ -36,7 +36,9 @@ export default function SuggestionsScreen({ city, category, suggestions, onAdd, 
             if (sortBy === 'trending') moodModifier = 'popular trending';
 
             // Point to the new FastAPI backend endpoint if in local dev, or relative path if deployed
-            const apiUrl = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api/scrape` : '/api/scrape';
+            // We strip any trailing slash from the env variable to avoid double slashes like '//api/scrape'
+            const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '');
+            const apiUrl = baseUrl ? `${baseUrl}/api/scrape` : '/api/scrape';
 
             const res = await fetch(apiUrl, {
                 method: 'POST',
