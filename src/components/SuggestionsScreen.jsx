@@ -50,7 +50,15 @@ export default function SuggestionsScreen({ city, category, suggestions, onAdd, 
                 }),
             });
 
-            const data = await res.json();
+            let data;
+            const contentType = res.headers.get("content-type");
+
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                data = await res.json();
+            } else {
+                const text = await res.text();
+                throw new Error(`Backend Error (Check VITE_API_BASE_URL): ${text.slice(0, 50)}...`);
+            }
 
             if (!res.ok) {
                 throw new Error(data.error || data.details || `API error: ${res.status}`);
