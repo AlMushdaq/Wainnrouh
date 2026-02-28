@@ -19,5 +19,6 @@ COPY . .
 # Expose the port (Railway provides the PORT environment variable dynamically)
 EXPOSE $PORT
 
-# Start the FastAPI Uvicorn server, using the Railway variables
-CMD ["sh", "-c", "xvfb-run -a uvicorn main:app --host 0.0.0.0 --port ${PORT:-3001}"]
+# Start via python main.py — Uvicorn is launched programmatically inside main.py
+# No port args here; main.py reads $PORT from the environment directly
+CMD ["xvfb-run", "-a", "python", "main.py"]

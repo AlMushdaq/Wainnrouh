@@ -97,6 +97,6 @@ async def scrape_google_maps(req: ScrapeRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    # Make sure to bind to 0.0.0.0 and use the PORT environment variable for Railway
-    port = int(os.getenv("PORT", 3001))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    # Fetch PORT from Railway's environment variable, default to 3001 for local dev
+    port = int(os.environ.get("PORT", 3001))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
