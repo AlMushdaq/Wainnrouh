@@ -20,4 +20,4 @@ COPY . .
 EXPOSE $PORT
 
 # Start the FastAPI Uvicorn server, using the Railway variables
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-3001}"]
+CMD ["sh", "-c", "xvfb-run -a uvicorn main:app --host 0.0.0.0 --port ${PORT:-3001}"]
